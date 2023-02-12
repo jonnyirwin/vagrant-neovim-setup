@@ -1,0 +1,31 @@
+---
+- name: Configure Neovim
+  hosts: all
+  remote_user: vagrant
+
+  tasks:
+  - name: Install required packages
+    dnf:
+      name:
+        - neovim
+        - git
+    become: true
+    register: install
+
+  - ansible.builtin.debug:
+      var: install
+
+  - name: Install volta
+    ansible.builtin.shell: curl https://get.volta.sh | bash
+
+  - name: Install Node and NPM
+    ansible.builtin.shell: volta install node && volta install npm
+
+  - name: Ensure Neovim config files are present
+    ansible.builtin.copy:
+      src: ./nvim
+      dest: /home/vagrant/.config
+      owner: vagrant
+      group: vagrant
+      mode: '0755'
+    become: true
